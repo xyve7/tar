@@ -1,3 +1,4 @@
+#define EMBEDDED
 #include "tar.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -8,13 +9,19 @@ int main() {
 
     FILE* fp = fopen("testing.tar", "rb");
     fseek(fp, 0, SEEK_END);
-    long tar_size = ftell(fp);
+    long t_size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    char* tar_buffer = malloc(tar_size);
-    fread(tar_buffer, 1, tar_size, fp);
+    char* tar_buffer = malloc(t_size);
 
-    tar_open(&t, tar_buffer, tar_size);
+    if (tar_buffer == NULL) {
+        puts("malloc failed");
+        return 0;
+    }
+
+    fread(tar_buffer, 1, t_size, fp);
+
+    tar_open(&t, tar_buffer, t_size);
 
     ustar_header hdr;
     char* buffer = NULL;
@@ -26,6 +33,9 @@ int main() {
         buffer[size] = '\0';
         printf("%s:\n%s", hdr.file_name, buffer);
     }
+
+    tar_close(&t);
+
     free(buffer);
     free(tar_buffer);
 }
