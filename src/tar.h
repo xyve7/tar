@@ -1,8 +1,10 @@
 #ifndef TAR_H
 #define TAR_H
 
-#include <stdint.h>
+#ifndef EMBEDDED
 #include <stdio.h>
+#endif
+#include <stdint.h>
 #include <string.h>
 
 typedef enum {
@@ -42,13 +44,29 @@ typedef struct {
     char padding[12];
 } ustar_header;
 
+#ifdef EMBEDDED
+typedef struct {
+    char* start;
+    char* current;
+    char* end;
+    char* last;
+} tar;
+#else
 typedef struct {
     FILE* fp;
     long last;
 } tar;
+#endif
 
+#ifdef EMBEDDED
+tar_error tar_open(tar* to, const char* buffer, size_t size);
+#else
 tar_error tar_open(tar* to, const char* filename, const char* mode);
+#endif
+
 tar_error tar_next(tar* to, ustar_header* out);
 tar_error tar_read(tar* to, ustar_header* header, void* out, size_t size);
 uint32_t tar_size(tar* to, ustar_header* header);
+tar_error tar_close(tar* to);
+
 #endif

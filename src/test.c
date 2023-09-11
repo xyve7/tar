@@ -5,7 +5,16 @@
 #include <tar.h>
 int main() {
     tar t;
-    tar_open(&t, "testing.tar", "rb");
+
+    FILE* fp = fopen("testing.tar", "rb");
+    fseek(fp, 0, SEEK_END);
+    long tar_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char* tar_buffer = malloc(tar_size);
+    fread(tar_buffer, 1, tar_size, fp);
+
+    tar_open(&t, tar_buffer, tar_size);
 
     ustar_header hdr;
     char* buffer = NULL;
@@ -18,4 +27,5 @@ int main() {
         printf("%s:\n%s", hdr.file_name, buffer);
     }
     free(buffer);
+    free(tar_buffer);
 }
