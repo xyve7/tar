@@ -1,14 +1,13 @@
 #ifndef TAR_H
 #define TAR_H
+
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 typedef enum {
     SUCCESS,
     ERRNO,
     END,
-    INVALID_HEADER,
 } tar_error;
 
 typedef enum {
@@ -30,7 +29,7 @@ typedef struct {
     char last_mod_time[12];
     char checksum[8];
     char type;
-    charlinked_file_name[100];
+    char linked_file_name[100];
     char ustar_ind[6];
     char ustar_ver[2];
     char owner_uname[32];
@@ -48,7 +47,8 @@ typedef struct {
 } tar;
 
 tar_error tar_open(tar* to, const char* buffer, size_t size);
-tar_error tar_next(tar* to, ustar_header* out, void** out_data);
+tar_error tar_next(tar* to, ustar_header* out);
+tar_error tar_read(tar* to, ustar_header* header, void* out_data, size_t size);
 uint32_t tar_size(tar* to, ustar_header* header);
 tar_error tar_close(tar* to);
 

@@ -1,4 +1,4 @@
-CC = clang
+CC = gcc 
 CFLAGS = -Wall -Wextra -Werror -std=c11 -Isrc/
 OUT = tartest 
 CFILES = $(shell find . -type f -name '*.c')
