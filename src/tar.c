@@ -1,4 +1,5 @@
 #include "tar.h"
+#include <stdio.h>
 uint32_t _tar_oct_to_dec(const char* oct_str, uint32_t len) {
     uint32_t ret = 0;
     while (len--) {
@@ -25,6 +26,13 @@ tar_error tar_next(tar* to, ustar_header* out) {
         if (memcmp(out->ustar_ind, "ustar", 5) != 0) {
             return END;
         }
+
+        to->save = to->current;
+
+        uint32_t tar_size = _tar_oct_to_dec(out->file_size, 11);
+        // Get the size of the file including the padding that TAR expects
+        to->current += ((tar_size + 511) / 512) * 512;
+
     } else {
         return END;
     }
@@ -40,6 +48,7 @@ tar_error tar_read(tar* to, ustar_header* header, void* out_data, size_t size) {
     // Get the size of the file including the padding that TAR expects
     size_t offset = ((tar_size + 511) / 512) * 512;
 
+    to->current = to->save;
     if (to->current + offset < to->end) {
         // Copy the actual data
         memcpy(out_data, to->current, tar_size);

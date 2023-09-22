@@ -44,6 +44,7 @@ typedef struct {
     const char* start;
     const char* current;
     const char* end;
+    const char* save;
 } tar;
 
 tar_error tar_open(tar* to, const char* buffer, size_t size);
